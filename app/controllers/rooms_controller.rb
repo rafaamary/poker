@@ -11,6 +11,17 @@ class RoomsController < ApplicationController
     render json: rooms, each_serializer: RoomSerializer
   end
 
+  def join
+    room = Room.find(params[:id])
+    player = Player.find(params[:player_id])
+
+    if room.player_join(player)
+      render json: { message: "Player joined successfully" }, status: :ok
+    else
+      render json: { error: "Player already in the room or could not be added" }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def room_params

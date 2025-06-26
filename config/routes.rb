@@ -4,4 +4,5 @@ Rails.application.routes.draw do
 
   post "/rooms", to: "rooms#create"
   get "/rooms", to: "rooms#index"
+  post "/rooms/:id/join", to: "rooms#join"
 end
