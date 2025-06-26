@@ -21,4 +21,23 @@ RSpec.describe PlayersController, type: :controller do
       })
     end
   end
+
+  describe '#delete' do
+    let!(:player) { Player.create!(name: 'John Doe') }
+
+    subject { delete :delete, params: { id: player.id } }
+
+    it 'deletes the player' do
+      expect {
+        subject
+      }.to change(Player, :count).by(-1)
+    end
+
+    it 'returns a success message' do
+      subject
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)).to eq({ 'message' => 'Player deleted successfully' })
+    end
+  end
 end
