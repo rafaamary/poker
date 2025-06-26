@@ -22,6 +22,17 @@ class RoomsController < ApplicationController
     end
   end
 
+  def leave
+    room = Room.find(params[:id])
+    player = Player.find(params[:player_id])
+
+    if room.player_leave(player)
+      render json: { message: "Player left successfully" }, status: :ok
+    else
+      render json: { error: "Player not in the room or could not be removed" }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def room_params

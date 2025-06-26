@@ -28,4 +28,30 @@ RSpec.describe Room, type: :model do
       end
     end
   end
+
+  describe '#player_leave' do
+    let(:room) { Room.create!(name: 'Test Room', max_players: 4) }
+    let(:player) { Player.create!(name: 'Test Player') }
+    let(:player_serializer) { PlayerSerializer.new(player).as_json.with_indifferent_access }
+
+    before { room.player_join(player) }
+
+    subject { room.player_leave(player) }
+
+    context 'when the player is in the room' do
+      it 'removes the player from the room' do
+        expect(subject).to be_truthy
+        expect(room.current_players).not_to include(player_serializer)
+      end
+    end
+
+    context 'when the player is not in the room' do
+      let(:another_player) { Player.create!(name: 'Another Player') }
+
+      it 'does not remove any player' do
+        expect(room.player_leave(another_player)).to be_falsey
+        expect(room.current_players).to include(player_serializer)
+      end
+    end
+  end
 end

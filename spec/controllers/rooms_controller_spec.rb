@@ -82,4 +82,41 @@ RSpec.describe RoomsController, type: :controller do
       end
     end
   end
+
+  describe '#leave' do
+    let!(:room) { Room.create!(name: 'Leaveable Room', max_players: 3) }
+    let!(:player) { Player.create!(name: 'Test Player') }
+
+    before do
+      room.player_join(player)
+    end
+
+    subject { post :leave, params: { id: room.id, player_id: player.id } }
+
+    context 'when the player leaves successfully' do
+      it 'removes the player from the room' do
+        expect {
+          subject
+        }.to change { room.reload.current_players.count }.by(-1)
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)).to eq({ 'message' => 'Player left successfully' })
+      end
+    end
+
+    context 'when the player is not in the room' do
+      before do
+        room.player_leave(player)
+      end
+
+      it 'does not remove the player again' do
+        expect {
+          subject
+        }.not_to change { room.reload.current_players.count }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)).to eq({ 'error' => 'Player not in the room or could not be removed' })
+      end
+    end
+end
 end
