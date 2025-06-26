@@ -22,4 +22,31 @@ RSpec.describe RoomsController, type: :controller do
       })
     end
   end
+
+  describe '#index' do
+    let!(:room1) { Room.create!(name: 'First Room', max_players: 4) }
+    let!(:room2) { Room.create!(name: 'Second Room', max_players: 6) }
+
+    subject { get :index }
+
+    it 'returns all rooms as JSON' do
+      subject
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)).to eq([
+        {
+          'id' => room1.id,
+          'name' => 'First Room',
+          'max_players' => 4,
+          'current_players' => []
+        },
+        {
+          'id' => room2.id,
+          'name' => 'Second Room',
+          'max_players' => 6,
+          'current_players' => []
+        }
+      ])
+    end
+  end
 end

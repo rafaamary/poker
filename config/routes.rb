@@ -3,4 +3,5 @@ Rails.application.routes.draw do
   delete "/players/:id", to: "players#delete"
 
   post "/rooms", to: "rooms#create"
+  get "/rooms", to: "rooms#index"
 end
