@@ -20,4 +20,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_26_201601) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "rooms", force: :cascade do |t|
+    t.string "name"
+    t.integer "max_players"
+    t.jsonb "current_players", default: [], array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 end
