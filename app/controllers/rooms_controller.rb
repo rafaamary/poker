@@ -33,6 +33,16 @@ class RoomsController < ApplicationController
     end
   end
 
+  def start
+    room = Room.find(params[:id])
+    game = Game.create!(room: room)
+
+    render json: {
+      message: 'Game started',
+      initial_state: game.initial_state,
+    }
+  end
+
   private
 
   def room_params

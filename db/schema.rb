@@ -10,15 +10,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_26_201601) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_29_205842) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "players", force: :cascade do |t|
-    t.string "name"
-    t.integer "chips", default: 1000, null: false
+  create_table "game_phases", force: :cascade do |t|
+    t.string "phase"
+    t.string "community_cards", default: [], array: true
+    t.bigint "game_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_game_phases_on_game_id"
+  end
+
+  create_table "games", force: :cascade do |t|
+    t.jsonb "initial_state"
+    t.bigint "room_id", null: false
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["room_id"], name: "index_games_on_room_id"
+  end
+
+  create_table "players", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "chips", default: 1000, null: false
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -28,4 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_26_201601) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "game_phases", "games"
+  add_foreign_key "games", "rooms"
 end

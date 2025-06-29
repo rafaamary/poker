@@ -118,5 +118,40 @@ RSpec.describe RoomsController, type: :controller do
         expect(JSON.parse(response.body)).to eq({ 'error' => 'Player not in the room or could not be removed' })
       end
     end
-end
+  end
+
+  describe '#start' do
+    let!(:room) { Room.create!(name: 'Startable Room', max_players: 4) }
+    let!(:player1) { Player.create!(name: 'Player 1') }
+    let!(:player2) { Player.create!(name: 'Player 2') }
+    let(:json_response) { JSON.parse(response.body) }
+    let(:cards_player1) { json_response['initial_state']['players'][0]['cards'] }
+    let(:cards_player2) { json_response['initial_state']['players'][1]['cards'] }
+
+    before do
+      room.player_join(player1)
+      room.player_join(player2)
+    end
+
+    subject { post :start, params: { id: room.id } }
+
+    it 'starts a new game in the room' do
+      expect {
+        subject
+      }.to change(Game, :count).by(1)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)).to eq({
+        'message' => 'Game started',
+        'initial_state' => {
+          'players' => [
+            { 'id' => player1.id, 'chips' => player1.chips, 'cards' => cards_player1 },
+            { 'id' => player2.id, 'chips' => player2.chips, 'cards' => cards_player2 }
+          ],
+          'community_cards' => [],
+          'pot' => 0
+        }
+      })
+    end
+  end
 end
