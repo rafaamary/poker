@@ -25,4 +25,8 @@ class Room < ApplicationRecord
   def players
     current_players.map { |p| Player.find(p["id"]) }
   end
+
+  def can_proceed_to_next_phase?
+    current_game.present? && current_game.game_phases.last.phase != 'river'
+  end
 end

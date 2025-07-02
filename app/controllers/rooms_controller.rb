@@ -61,6 +61,13 @@ class RoomsController < ApplicationController
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  def next_phase
+    NextPhaseService.new(params[:id]).perform
+  rescue StandardError => e
+    Rails.logger.error("Error proceeding to next phase: #{e.message}")
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
   private
 
   def room_params
