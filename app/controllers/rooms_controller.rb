@@ -43,9 +43,31 @@ class RoomsController < ApplicationController
     }
   end
 
+  def action
+    room = Room.find(params[:id])
+    player = Player.find(params[:player_id])
+
+    game_action = PlayerGameActionService.new(room, player, params_action, params[:amount]).perform
+
+    render json: {
+      message: 'Action performed successfully',
+      game_state: {
+        current_turn: game_action['current_turn'],
+        pot: game_action['pot'],
+      }
+    }
+  rescue StandardError => e
+    Rails.logger.error("Error performing action: #{e.message}")
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
   private
 
   def room_params
     params.permit(:name, :max_players)
+  end
+
+  def params_action
+    request.request_parameters[:action]
   end
 end

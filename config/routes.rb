@@ -7,4 +7,5 @@ Rails.application.routes.draw do
   post "/rooms/:id/join", to: "rooms#join"
   post "/rooms/:id/leave", to: "rooms#leave"
   post "/rooms/:id/start", to: "rooms#start"
+  post "/rooms/:id/action", to: "rooms#action"
 end

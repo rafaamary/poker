@@ -11,7 +11,6 @@ class Game < ApplicationRecord
     self.initial_state = {
       players: players,
       community_cards: [],
-      pot: 0,
     }
   end
 

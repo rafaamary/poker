@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_29_205842) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_02_004317) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "game_actions", force: :cascade do |t|
+    t.string "action"
+    t.bigint "player_id", null: false
+    t.bigint "game_phase_id", null: false
+    t.integer "amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_phase_id"], name: "index_game_actions_on_game_phase_id"
+    t.index ["player_id"], name: "index_game_actions_on_player_id"
+  end
 
   create_table "game_phases", force: :cascade do |t|
     t.string "phase"
@@ -26,6 +37,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_29_205842) do
   create_table "games", force: :cascade do |t|
     t.jsonb "initial_state"
     t.bigint "room_id", null: false
+    t.integer "pot", default: 0, null: false
     t.datetime "started_at"
     t.datetime "finished_at"
     t.datetime "created_at", null: false
@@ -48,6 +60,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_29_205842) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "game_actions", "game_phases"
+  add_foreign_key "game_actions", "players"
   add_foreign_key "game_phases", "games"
   add_foreign_key "games", "rooms"
 end

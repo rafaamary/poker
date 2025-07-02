@@ -1,4 +1,6 @@
 class Room < ApplicationRecord
+  has_many :games, dependent: :destroy
+
   validates :name, presence: true
   validates :max_players, presence: true, numericality: { only_integer: true, greater_than: 0 }
 
@@ -14,5 +16,13 @@ class Room < ApplicationRecord
 
     self.current_players = current_players.reject { |p| p["id"] == player.id }
     save
+  end
+
+  def current_game
+    games.find_by(finished_at: nil)
+  end
+
+  def players
+    current_players.map { |p| Player.find(p["id"]) }
   end
 end
