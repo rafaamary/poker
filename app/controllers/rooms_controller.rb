@@ -68,6 +68,16 @@ class RoomsController < ApplicationController
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  def end
+    room = Room.find(params[:id])
+    end_game = EndGameService.new(room).perform
+
+    render json: end_game, status: :ok
+  rescue StandardError => e
+    Rails.logger.error("Error ending game: #{e.message}")
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
   private
 
   def room_params

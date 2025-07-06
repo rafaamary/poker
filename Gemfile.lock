@@ -195,6 +195,9 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.1.16)
+    rack-cors (3.0.0)
+      logger
+      rack (>= 3.0.14)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -284,6 +287,7 @@ GEM
       rubocop (>= 1.72)
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
+    ruby-poker (1.0.1)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     shoulda-matchers (5.3.0)
@@ -352,9 +356,11 @@ DEPENDENCIES
   kamal
   pg (~> 1.1)
   puma (>= 5.0)
+  rack-cors
   rails (~> 8.0.2)
   rspec-rails
   rubocop-rails-omakase
+  ruby-poker
   shoulda-matchers (~> 5.0)
   solid_cable
   solid_cache
