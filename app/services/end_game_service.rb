@@ -6,6 +6,7 @@ class EndGameService
   def perform
     winner = determine_winner
     distribute_pot(winner)
+    current_game.update!(finished_at: Time.current)
 
     {
       winner: {

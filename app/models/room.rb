@@ -6,6 +6,7 @@ class Room < ApplicationRecord
 
   def player_join(player)
     return false if current_players.any? { |p| p["id"] == player.id }
+    return false if current_players.size >= max_players
 
     self.current_players << PlayerSerializer.new(player).as_json
     save
