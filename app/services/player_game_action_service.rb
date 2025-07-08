@@ -56,7 +56,7 @@ class PlayerGameActionService
   end
 
   def current_game_phase
-    current_game.game_phases.last
+    current_game&.game_phases&.last
   end
 
   def biggest_bet

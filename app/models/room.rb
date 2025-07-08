@@ -28,6 +28,8 @@ class Room < ApplicationRecord
   end
 
   def can_proceed_to_next_phase?
-    current_game&.game_phases&.last.phase != "river"
+    return false unless current_game
+
+    current_game.game_phases&.last.phase != "river"
   end
 end

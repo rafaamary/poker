@@ -148,7 +148,6 @@ RSpec.describe RoomsController, type: :controller do
             { "id" => player1.id, "chips" => player1.chips, "cards" => cards_player1 },
             { "id" => player2.id, "chips" => player2.chips, "cards" => cards_player2 }
           ],
-          "community_cards" => [],
           "pot" => 0
         }
       })

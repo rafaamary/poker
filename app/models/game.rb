@@ -10,6 +10,10 @@ class Game < ApplicationRecord
     save!
   end
 
+  def current_phase
+    game_phases.last
+  end
+
   private
 
   def set_initial_state

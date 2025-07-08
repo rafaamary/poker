@@ -23,7 +23,6 @@ class GameAction < ApplicationRecord
   scope :call, -> { where(action: "call") }
   scope :raise, -> { where(action: "raise") }
   scope :fold, -> { where(action: "fold") }
-  scope :showdown, -> { where(action: "showdown") }
   scope :check_or_fold, -> { where(action: %w[check fold]) }
   scope :call_or_raise, -> { where(action: %w[call raise]) }
 
