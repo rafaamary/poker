@@ -1,10 +1,10 @@
 class GamePhase < ApplicationRecord
-  PHASES = %w[pré-flop flop turn river].freeze
-  COUNT_CARDS = {
-    'flop' => 3,
-    'turn' => 1,
-    'river' => 1,
-  }
+  PHASES = %w[pre-flop flop turn river].freeze
+  COMMUNITY_CARD_INDEXES = {
+    "flop" => [ 0, 1, 2 ],
+    "turn" => [ 3 ],
+    "river" => [ 4 ]
+  }.freeze
 
   belongs_to :game
   has_many :game_actions, dependent: :destroy
@@ -12,9 +12,12 @@ class GamePhase < ApplicationRecord
   validates :phase, presence: true, inclusion: { in: PHASES }
 
   def next_phase!
-    next_phase = PHASES[PHASES.index(phase) + 1]
+    current_index = PHASES.index(phase)
+    return if current_index.nil? || current_index >= PHASES.size - 1
 
-    return unless next_phase
+    next_phase = PHASES[current_index + 1]
+
+    initiate_player!
 
     GamePhase.create!(
       game: Game.find(game.id),
@@ -35,17 +38,25 @@ class GamePhase < ApplicationRecord
     game_actions.call_or_raise.maximum(:amount) || 0
   end
 
-  def cards(phase)
-    return if phase == 'pré-flop'
+  private
 
-    full_deck.pop(COUNT_CARDS[phase])
+  def cards(phase)
+    return [] unless COMMUNITY_CARD_INDEXES.key?(phase)
+
+    game.initial_state["community_cards"].values_at(*COMMUNITY_CARD_INDEXES[phase])
   end
 
-  def full_deck
-    values = %w[2 3 4 5 6 7 8 9 10 J Q K A]
-    suits  = %w[S H D C]
+  def initiate_player!
+    current_player_id = room.current_players[0]
 
-    deck = values.product(suits).map { |value, suit| "#{value}#{suit}" }
-    deck.shuffle
+    game.update!(
+      initial_state: game.initial_state.merge(
+        "current_player" => current_player_id
+      )
+    )
+  end
+
+  def room
+    game.room
   end
 end

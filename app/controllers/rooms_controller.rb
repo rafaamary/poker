@@ -3,6 +3,8 @@ class RoomsController < ApplicationController
     room = Room.create!(room_params)
 
     render json: RoomSerializer.new(room).as_json, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { error: e.message }, status: :unprocessable_entity
   end
 
   def index
@@ -38,22 +40,21 @@ class RoomsController < ApplicationController
     game = Game.create!(room: room)
 
     render json: {
-      message: 'Game started',
-      initial_state: game.initial_state,
+      message: "Game started",
+      initial_state: game.initial_state.slice("players", "chips").merge(pot: game.pot)
     }
   end
 
   def action
     room = Room.find(params[:id])
     player = Player.find(params[:player_id])
-
     game_action = PlayerGameActionService.new(room, player, params_action, params[:amount]).perform
 
     render json: {
-      message: 'Action performed successfully',
+      message: "Action performed successfully",
       game_state: {
-        current_turn: game_action['current_turn'],
-        pot: game_action['pot'],
+        current_turn: game_action["current_turn"],
+        pot: game_action["pot"]
       }
     }
   rescue StandardError => e
@@ -71,13 +72,12 @@ class RoomsController < ApplicationController
   end
 
   def end
-    puts params[:id]
     room = Room.find(params[:id])
     end_game = EndGameService.new(room).perform
 
     render json: end_game, status: :ok
   rescue StandardError => e
-    Rails.logger.error("oom = Room.find(params[:id])Error ending game: #{e.message}")
+    Rails.logger.error("Error ending game: #{e.message}")
     render json: { error: e.message }, status: :unprocessable_entity
   end
 

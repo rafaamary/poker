@@ -50,6 +50,6 @@ end
 gem "active_model_serializers", "~> 0.10.0"
 
 gem "rspec-rails"
-gem 'ruby-poker'
-gem 'rack-cors'
-gem 'redis', '~> 4.0'
+gem "ruby-poker"
+gem "rack-cors"
+gem "redis", "~> 4.0"

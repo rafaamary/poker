@@ -5,44 +5,55 @@ class Game < ApplicationRecord
   before_create :set_initial_state, :set_started_at
   after_create :create_initial_game_phase
 
+  def next_player!
+    initial_state["current_player"] = next_player_id
+    save!
+  end
+
   private
 
   def set_initial_state
+    deck = Deck.new
+
     self.initial_state = {
-      players: players,
-      community_cards: [],
+      players: assign_players(deck),
+      community_cards: deck.draw(5),
+      current_player: determine_order[0]
     }
+  end
+
+  def assign_players(deck)
+    room.players.map do |player|
+      {
+        id: player.id,
+        chips: player.chips,
+        cards: deck.draw(2)
+      }
+    end
   end
 
   def set_started_at
     self.started_at = Time.current
   end
 
-  def players
-    room.current_players.map do |player|
-      player.slice('id', 'chips').merge(cards)
-    end
-  end
-
-  def cards
-    {
-      cards: full_deck.pop(2)
-    }.with_indifferent_access
-  end
-
-  def full_deck
-    values = %w[2 3 4 5 6 7 8 9 10 J Q K A]
-    suits  = %w[S H D C]
-
-    deck = values.product(suits).map { |value, suit| "#{value}#{suit}" }
-    deck.shuffle
-  end
-
   def create_initial_game_phase
-    GamePhase.create!(
-      game: self,
-      phase: 'pré-flop',
-      community_cards: [],
+    game_phases.create!(
+      phase: "pre-flop",
+      community_cards: []
     )
+  end
+
+  def determine_order
+    room.current_players
+  end
+
+  def next_player_id
+    current_index = determine_order.index { |p| p == current_player_id }
+    next_index = (current_index + 1) % determine_order.size
+    determine_order[next_index]
+  end
+
+  def current_player_id
+    initial_state["current_player"]
   end
 end

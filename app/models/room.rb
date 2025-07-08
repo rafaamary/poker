@@ -5,18 +5,18 @@ class Room < ApplicationRecord
   validates :max_players, presence: true, numericality: { only_integer: true, greater_than: 0 }
 
   def player_join(player)
-    return false if current_players.any? { |p| p["id"] == player.id }
+    return false if current_players.include?(player.id)
     return false if current_players.size >= max_players
 
-    self.current_players << PlayerSerializer.new(player).as_json
-    save
+    self.current_players << player.id
+    save!
   end
 
   def player_leave(player)
-    return false unless current_players.any? { |p| p["id"] == player.id }
+    return false unless current_players.include?(player.id)
 
-    self.current_players = current_players.reject { |p| p["id"] == player.id }
-    save
+    self.current_players -= [ player.id ]
+    save!
   end
 
   def current_game
@@ -24,10 +24,10 @@ class Room < ApplicationRecord
   end
 
   def players
-    current_players.map { |p| Player.find(p["id"]) }
+    Player.where(id: current_players)
   end
 
   def can_proceed_to_next_phase?
-    current_game.present? && current_game.game_phases.last.phase != 'river'
+    current_game&.game_phases&.last.phase != "river"
   end
 end

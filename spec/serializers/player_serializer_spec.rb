@@ -1,5 +1,5 @@
 RSpec.describe PlayerSerializer do
-  let(:player) { Player.create!(name: 'John Doe') }
+  let(:player) { Player.create!(name: "John Doe") }
   let(:expected_json) {
     {
       id: player.id,
@@ -10,7 +10,7 @@ RSpec.describe PlayerSerializer do
 
   subject { described_class.new(player) }
 
-  it 'serializes id, name and fixed chips' do
+  it "serializes id, name and fixed chips" do
     expect(subject.serializable_hash).to eq(expected_json)
   end
 end
