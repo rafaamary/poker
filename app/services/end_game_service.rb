@@ -1,4 +1,6 @@
 class EndGameService
+  attr_accessor :room
+
   def initialize(room)
     @room = room
   end
@@ -6,18 +8,36 @@ class EndGameService
   def perform
     winner = determine_winner
     distribute_pot(winner)
-    current_game.update!(finished_at: Time.current)
+    game = current_game
+    pot_amount = game.pot
+    winner_hand = hand_strength(all_cards(winner)).rank
+
+    game.update!(
+      finished_at: Time.current,
+      initial_state: game.initial_state.merge(
+        winner: { player_id: winner.id, hand: winner_hand },
+      ),
+    )
 
     {
       winner: {
         player_id: winner.id,
-        hand: hand_strength(all_cards(winner)).rank,
+        hand: winner_hand,
       },
-      pot: current_game.pot,
+      pot: pot_amount,
     }
   end
 
   private
+
+  def winner
+    winner = determine_winner
+
+    {
+      player_id: winner.id,
+      hand: hand_strength(all_cards(winner)).rank,
+    }
+  end
 
   def determine_winner
     players.max_by { |player| hand_strength(all_cards(player)).score[0][0] }

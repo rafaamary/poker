@@ -62,19 +62,22 @@ class RoomsController < ApplicationController
   end
 
   def next_phase
-    NextPhaseService.new(params[:id]).perform
+    next_phase = NextPhaseService.new(params[:id]).perform
+
+    render json: next_phase, status: :ok
   rescue StandardError => e
     Rails.logger.error("Error proceeding to next phase: #{e.message}")
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
   def end
+    puts params[:id]
     room = Room.find(params[:id])
     end_game = EndGameService.new(room).perform
 
     render json: end_game, status: :ok
   rescue StandardError => e
-    Rails.logger.error("Error ending game: #{e.message}")
+    Rails.logger.error("oom = Room.find(params[:id])Error ending game: #{e.message}")
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
