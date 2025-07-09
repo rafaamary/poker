@@ -20,7 +20,7 @@ class GamePhase < ApplicationRecord
     initiate_player!
 
     GamePhase.create!(
-      game: Game.find(game.id),
+      game: game,
       phase: next_phase,
       community_cards: cards(next_phase),
     )

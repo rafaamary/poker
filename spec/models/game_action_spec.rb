@@ -31,27 +31,27 @@ RSpec.describe GameAction, type: :model do
 
   describe "scopes" do
     it "returns actions for check" do
-      expect(GameAction.check.to_sql).to include(`"action\" = 'check'`)
+      expect(GameAction.check.to_sql).to include(`"action\" = "check"`)
     end
 
     it "returns actions for call" do
-      expect(GameAction.call.to_sql).to include(`"action\" = 'call'`)
+      expect(GameAction.call.to_sql).to include(`"action\" = "call"`)
     end
 
     it "returns actions for raise" do
-      expect(GameAction.raise.to_sql).to include(`"action\" = 'raise'`)
+      expect(GameAction.raise.to_sql).to include(`"action\" = "raise"`)
     end
 
     it "returns actions for fold" do
-      expect(GameAction.fold.to_sql).to include(`"action\" = 'fold'`)
+      expect(GameAction.fold.to_sql).to include(`"action\" = "fold"`)
     end
 
     it "returns actions for check or fold" do
-      expect(GameAction.check_or_fold.to_sql).to include(`"action\" IN ('check', 'fold')`)
+      expect(GameAction.check_or_fold.to_sql).to include(`"action\" IN ("check", "fold")`)
     end
 
     it "returns actions for call or raise" do
-      expect(GameAction.call_or_raise.to_sql).to include(`"action\" IN ('call', 'raise')`)
+      expect(GameAction.call_or_raise.to_sql).to include(`"action\" IN ("call", "raise")`)
     end
   end
 

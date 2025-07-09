@@ -13,6 +13,7 @@ class EndGameService
 
     distribute_pot(winner)
     update_game(game, winner, winner_hand)
+    room.update!(current_players: [])
 
     {
       winner: {

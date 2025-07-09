@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   # ActionCable
-  mount ActionCable.server => '/cable'
+  mount ActionCable.server => "/cable"
 
   post "/players", to: "players#create"
   delete "/players/:id", to: "players#delete"

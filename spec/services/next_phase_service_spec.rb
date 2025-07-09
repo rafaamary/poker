@@ -11,8 +11,8 @@ RSpec.describe NextPhaseService do
     game
   end
 
-  describe '#perform' do
-    it 'proceeds to the next phase' do
+  describe "#perform" do
+    it "proceeds to the next phase" do
       service = NextPhaseService.new(room.id)
       result = service.perform
 
@@ -20,10 +20,10 @@ RSpec.describe NextPhaseService do
       expect(game.reload.current_phase.phase).to eq("flop")
     end
 
-    context 'when error occurs' do
+    context "when error occurs" do
       let!(:game_phase) { GamePhase.create!(game: game, phase: "river") }
 
-      it 'raises an error' do
+      it "raises an error" do
         service = NextPhaseService.new(room.id)
 
         expect { service.perform }.to raise_error("Room is not in a valid state to proceed to the next phase")

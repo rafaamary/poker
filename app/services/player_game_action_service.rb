@@ -1,4 +1,6 @@
 class PlayerGameActionService
+  include WebSocketBroadcaster
+
   attr_accessor :player, :action, :amount, :room, :game_action
 
   def initialize(room, player, action, amount = nil)
@@ -11,17 +13,22 @@ class PlayerGameActionService
   def perform
     validate!
 
+    game_action = nil
+
     ActiveRecord::Base.transaction do
       game_action = create_game_action
+      room_id = room.id
       update_game_pot
       update_player_chips
       update_current_player
 
-      {
-        current_turn: game_action.current_turn,
-        pot: current_game.pot
-    }.with_indifferent_access
+      broadcast_player_action(room.id, game_action, current_game.reload)
     end
+
+    {
+      current_turn: game_action.current_turn,
+      pot: current_game.pot
+    }.with_indifferent_access
   rescue StandardError => e
     Rails.logger.error("Error performing game action: #{e.message}")
 
@@ -31,7 +38,7 @@ class PlayerGameActionService
   private
 
   def validate!
-    raise ArgumentError, "Jogador não está na sala" unless room.players.include?(player)
+    raise ArgumentError, "Jogador não está na sala" unless room.current_players.include?(player.id)
     raise ArgumentError, "Ação inválida" unless %w[check call raise fold].include?(action)
     raise ArgumentError, "Ação não permitida no estado atual: #{action}" unless valid_action?
     raise ArgumentError, "Insufficient chips" if player.chips < amount.to_i && [ "raise", "call" ].include?(action)
@@ -65,17 +72,20 @@ class PlayerGameActionService
 
   def create_game_action
     GameAction.create!(
-      player: Player.find(player.id),
+      player: @player,
       action: action,
       amount: amount,
-      game_phase:  GamePhase.find(current_game_phase.id),
+      game_phase:  current_game_phase,
     )
   end
 
   def update_player_chips
     return if action == "check" || action == "fold"
 
-    player.update!(chips: player.chips - amount.to_i || 0)
+    current_amount = amount.to_i || 0
+    new_chips = player.chips - current_amount
+
+    player.update!(chips: new_chips)
   end
 
   def valid_action?
@@ -98,7 +108,6 @@ class PlayerGameActionService
   end
 
   def update_current_player
-    current_game.initial_state["current_player"] = current_game.next_player!
-    current_game.save!
+    current_game.next_player!
   end
 end

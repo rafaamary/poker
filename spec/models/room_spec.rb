@@ -96,7 +96,7 @@ RSpec.describe Room, type: :model do
       allow(room).to receive(:current_game).and_return(game)
     end
 
-    context "when the last game phase is not 'river'" do
+    context "when the last game phase is not river" do
       before do
         allow(game).to receive_message_chain(:game_phases, :last, :phase).and_return("turn")
       end
@@ -106,7 +106,7 @@ RSpec.describe Room, type: :model do
       end
     end
 
-    context "when the last game phase is 'river'" do
+    context "when the last game phase is river" do
       before do
         allow(game).to receive_message_chain(:game_phases, :last, :phase).and_return("river")
       end

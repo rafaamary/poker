@@ -39,24 +39,42 @@ class RoomsController < ApplicationController
     room = Room.find(params[:id])
     game = Game.create!(room: room)
 
-    render json: {
+    response_data = {
       message: "Game started",
       initial_state: game.initial_state.slice("players", "chips").merge(pot: game.pot)
     }
+
+    ActionCable.server.broadcast(
+      "game_room_#{room.id}",
+      {
+        type: "game_started",
+        game_data: response_data.merge(current_player: game.initial_state["current_player"])
+      }
+    )
+
+    render json: response_data
   end
 
   def action
     room = Room.find(params[:id])
     player = Player.find(params[:player_id])
     game_action = PlayerGameActionService.new(room, player, params_action, params[:amount]).perform
+    game = room.reload.current_game
 
-    render json: {
+    response_data = {
       message: "Action performed successfully",
       game_state: {
         current_turn: game_action["current_turn"],
         pot: game_action["pot"]
       }
     }
+
+    ActionCable.server.broadcast(
+      "game_room_#{room.id}",
+      game.initial_state.merge(game_id: game.id)
+    )
+
+    render json: response_data
   rescue StandardError => e
     Rails.logger.error("Error performing action: #{e.message}")
     render json: { error: e.message }, status: :unprocessable_entity

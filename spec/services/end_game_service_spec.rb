@@ -12,8 +12,8 @@ RSpec.describe EndGameService do
     game.update!(pot: 200)
   end
 
-  describe '#perform' do
-    it 'winner and distributes the pot' do
+  describe "#perform" do
+    it "winner and distributes the pot" do
       service = EndGameService.new(room)
       allow(service).to receive(:determine_winner).and_return(player1)
       allow(service).to receive(:all_cards).and_return([])
