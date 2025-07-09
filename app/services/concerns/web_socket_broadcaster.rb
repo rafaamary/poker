@@ -19,7 +19,7 @@ module WebSocketBroadcaster
         game_state: {
           pot: game.pot,
           phase: game.current_phase.phase,
-          community_cards: game.current_phase.community_cards,
+          community_cards: game.community_cards,
           current_player: game.initial_state["current_player"]
         }
       }
@@ -84,7 +84,7 @@ module WebSocketBroadcaster
           id: game.id,
           pot: game.pot,
           phase: game.current_phase&.phase,
-          community_cards: game.current_phase&.community_cards || [],
+          community_cards: game.community_cards || [],
           started_at: game.started_at,
           finished_at: game.finished_at
         } : nil,
@@ -111,7 +111,7 @@ module WebSocketBroadcaster
         },
         current_phase: {
           phase: game.current_phase&.phase || "pre-flop",
-          community_cards: game.current_phase&.community_cards || []
+          community_cards: game.community_cards || []
         },
         room: {
           id: room.id,

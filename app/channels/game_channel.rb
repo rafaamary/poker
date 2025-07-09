@@ -185,7 +185,7 @@ class GameChannel < ApplicationCable::Channel
             cards: player_data&.dig("cards") || []
           }
         end,
-        community_cards: game.current_phase&.community_cards || []
+        community_cards: game.community_cards || []
       }
 
       transmit({
@@ -297,7 +297,7 @@ class GameChannel < ApplicationCable::Channel
       timestamp: Time.current.iso8601,
       data: {
         phase: new_phase.phase,
-        community_cards: new_phase.community_cards,
+        community_cards: game.community_cards,
         game_state: {
           current_player: game.initial_state["current_player"],
           pot: game.pot
@@ -328,13 +328,10 @@ class GameChannel < ApplicationCable::Channel
   def check_and_advance_phase(game, room_id)
     if defined?(NextPhaseService)
       next_phase_result = NextPhaseService.new(room_id).perform
+      next_player = Player.find(game.initial_state["current_player"])
 
-      if next_phase_result[:phase_changed]
-        broadcast_phase_change(room_id, game.reload, game.current_phase)
-      end
-
-      if next_phase_result[:turn_changed]
-        next_player = Player.find(game.initial_state["current_player"])
+      if next_phase_result
+        broadcast_phase_change(room_id, game, next_phase_result)
         broadcast_turn_change(room_id, game, next_player)
       end
     end

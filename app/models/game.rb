@@ -14,6 +14,10 @@ class Game < ApplicationRecord
     game_phases.last
   end
 
+  def community_cards
+    game_phases.pluck(:community_cards).flatten.compact
+  end
+
   private
 
   def set_initial_state
