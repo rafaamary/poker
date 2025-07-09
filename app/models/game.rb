@@ -6,7 +6,7 @@ class Game < ApplicationRecord
   after_create :create_initial_game_phase
 
   def next_player!
-    initial_state["current_player"] = next_player_id
+    self.initial_state["current_player"] = next_player_id
     save!
   end
 

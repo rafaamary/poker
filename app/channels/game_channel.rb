@@ -6,11 +6,11 @@ class GameChannel < ApplicationCable::Channel
       begin
         player = Player.find(params[:player_id])
         @authenticated_player = player
-        Rails.logger.info "🔐 Jogador #{player.name} (ID: #{player.id}) autenticado automaticamente no canal"
+        Rails.logger.info "Jogador #{player.name} (ID: #{player.id}) autenticado automaticamente no canal"
 
         transmit_success("Authenticated as #{player.name}")
       rescue ActiveRecord::RecordNotFound
-        Rails.logger.error "❌ Player #{params[:player_id]} não encontrado para autenticação automática"
+        Rails.logger.error "Player #{params[:player_id]} não encontrado para autenticação automática"
         transmit_error("Player not found")
         return
       end
@@ -18,7 +18,7 @@ class GameChannel < ApplicationCable::Channel
 
     if params[:room_id].present?
       stream_from "game_room_#{params[:room_id]}"
-      Rails.logger.info "📡 Streaming da sala #{params[:room_id]} iniciado"
+      Rails.logger.info "Streaming da sala #{params[:room_id]} iniciado"
     end
   end
 
@@ -146,9 +146,6 @@ class GameChannel < ApplicationCable::Channel
       unless is_player_turn?(game, authenticated_player)
         return transmit_error("Not your turn")
       end
-
-      puts "@@@@@@@@@@@@@@@@@"
-      puts "Player action: #{action}, Amount: #{amount}"
 
       service = PlayerGameActionService.new(room, player, action, amount)
       result = service.perform
@@ -330,7 +327,7 @@ class GameChannel < ApplicationCable::Channel
 
   def check_and_advance_phase(game, room_id)
     if defined?(NextPhaseService)
-      next_phase_result = NextPhaseService.new(game).call
+      next_phase_result = NextPhaseService.new(room_id).perform
 
       if next_phase_result[:phase_changed]
         broadcast_phase_change(room_id, game.reload, game.current_phase)

@@ -22,7 +22,7 @@ class PlayerGameActionService
       update_player_chips
       update_current_player
 
-      broadcast_player_action(room.id, game_action, current_game.reload)
+      broadcast_player_action(room_id, game_action, current_game.reload)
     end
 
     {
